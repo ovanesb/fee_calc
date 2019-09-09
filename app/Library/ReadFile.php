@@ -9,6 +9,16 @@ class ReadFile extends Validation
 {
 
     /**
+     * Commission fees for natural and legal users.
+     *
+     * @var array
+     */
+    private $cashOutFee = [
+      'natural' => 0.3,
+      'legal' => 0.3
+    ];
+
+    /**
      * Open given input file.
      *
      * @param $file
@@ -42,12 +52,20 @@ class ReadFile extends Validation
     /**
      * Do calculation print out the results in command line and write them in output.csv file.
      *
+     * $post[0] - Date of transaction.
+     * $post[1] - User identificator number .
+     * $post[2] - User type.
+     * $post[3] - Operation type.
+     * $post[4] - Operation amount.
+     * $post[5] - Operation currency.
+     *
      * @param $filePointer
      */
     public function calculate($filePointer)
     {
 
         $commissionFees = new CommissionFees();
+        $userTransaction = [];
 
         foreach ($this->readCSV($filePointer) as $post) {
             if (!$post) {
@@ -74,17 +92,30 @@ class ReadFile extends Validation
                     case 'cash_in':
                         $fee = $commissionFees->cashIn($post[4], $post[5]);
                         $list = [
-                          [$fee]
+                            [$fee]
                         ];
                         echo $fee , "\n";
                         break;
 
                     case 'cash_out':
-                        $fee = $commissionFees->cashOut($post[4], $post[2], $post[5]);
-                        $list = [
-                          [$fee]
-                        ];
-                        echo $fee , "\n";
+                        $year = date('Y', strtotime($post[0]));
+                        $weekNumber = date('W', strtotime($post[0]));
+                        $userTransaction[$post[1]][$year][$weekNumber] = ['amount' => $post[4], 'date' => $post[0]];
+
+                        if (count($userTransaction[$post[1]][$year][$weekNumber]) <= 3) {
+                            $fee = $commissionFees->cashOut($post[4], $post[2], $post[5]);
+                            $list = [
+                                [$fee]
+                            ];
+                            echo $fee , "\n";
+                        } else {
+                            $fee = ($this->cashOutFee[$post[3]]/ 100) * $post[4];
+                            $list = [
+                                [$fee]
+                            ];
+                            echo $fee , "\n";
+                        }
+
                         break;
                 }
             }
