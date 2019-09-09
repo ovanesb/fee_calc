@@ -51,7 +51,7 @@ class CommissionFees
      *
      * @return float|int
      */
-    public function cashIn($amount, $currency)
+    public function cashIn($amount)
     {
         $fee = $this->percentCalculation($this->cashInFee, $amount);
         return $fee > 5 ? 5.00 : $fee;

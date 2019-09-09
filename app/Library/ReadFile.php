@@ -90,7 +90,7 @@ class ReadFile extends Validation
 
                 switch ($post[3]) {
                     case 'cash_in':
-                        $fee = $commissionFees->cashIn($post[4], $post[5]);
+                        $fee = $commissionFees->cashIn($post[4]);
                         $list = [
                             [$fee]
                         ];

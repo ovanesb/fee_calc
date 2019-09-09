@@ -23,7 +23,7 @@ class Validation
      * @param $date
      * @return bool
      */
-    private function validateDate($date)
+    public function validateDate($date)
     {
         $format = 'Y-m-d';
         $d = DateTime::createFromFormat($format, $date);
